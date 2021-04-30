@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { useQuery } from "@apollo/client";
-import { getAuthorsQuery } from "../queries/queries";
+import { useQuery, useMutation } from "@apollo/client";
+import {
+  GetAuthorsQuery,
+  AddBookMutation,
+  GetBooksQuery,
+} from "../queries/queries";
 
 const AddBook = () => {
   const [form, setform] = useState({});
-  const { loading, error, data } = useQuery(getAuthorsQuery);
-
+  const { loading, error, data } = useQuery(GetAuthorsQuery);
+  const [addBookMutation] = useMutation(AddBookMutation);
   if (error) return <p>Error :(</p>;
 
   const displayAuthors = () => {
@@ -26,7 +30,12 @@ const AddBook = () => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(form);
+    addBookMutation({
+      variables: {
+        ...form,
+      },
+      refetchQueries: [{ query: GetBooksQuery }],
+    });
   };
   return (
     <form id="add-book" onSubmit={handleSubmit}>
